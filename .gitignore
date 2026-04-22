@@ -1,0 +1,32 @@
+# --- 虛擬環境 (Virtual Environments) ---
+venv/
+.venv/
+env/
+bin/
+include/
+lib/
+share/
+pyvenv.cfg
+
+# --- Python 暫存與編譯檔 ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- 專案特定暫存檔 ---
+outputs/
+# 如果你希望保留 outputs 資料夾但清空內容，可以改用下面這兩行：
+# outputs/*
+# !outputs/.gitkeep
+
+# --- 作業系統與編輯器暫存 ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- 敏感資訊 (如 API Key) ---
+.env

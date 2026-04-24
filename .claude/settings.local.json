@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:/Users/slab/Desktop/Test_small_file1\" add build_plan_overview.md build_plan/)",
+      "Bash(git -C \"C:/Users/slab/Desktop/Test_small_file1\" commit -m \"snapshot: installer package before build\")"
+    ]
+  }
+}

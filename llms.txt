@@ -1,0 +1,29 @@
+# llms.txt
+
+Repository navigation index for the AI News Digest System (Week 4 project). For behavior rules, see `CLAUDE.md`.
+
+## Entry Points by Task
+
+- Understand repo layout → [docs/architecture.md](docs/architecture.md)
+- Make repository changes → [docs/change_principles.md](docs/change_principles.md)
+- Check recent work or debug existing behavior → [docs/changes/current_index.md](docs/changes/current_index.md)
+- Run a recurring workflow → [skills/](skills/) (topic news search, article digest writing)
+- Find team-specific conventions → [AGENTS.md](AGENTS.md)
+
+## Repository Map
+
+- [CLAUDE.md](CLAUDE.md) — global agent operating rules (distilled; SOP standard sections + team-specific rules).
+- [AGENTS.md](AGENTS.md) — authoritative team rules: project scope, engineering principles, guardrails.
+- [docs/](docs/) — repository documentation root.
+- [app/](app/) — core application code: search, summarizer, writer, models, main entrypoint.
+- [tests/](tests/) — test suite for search, summarizer, writer, and entrypoint behavior.
+- [skills/](skills/) — reusable skill instructions for recurring workflows.
+
+## Reference Pointers
+
+- [docs/change_principles.md](docs/change_principles.md) — cross-module change principles (read before any change).
+- [docs/changes/current_index.md](docs/changes/current_index.md) — recent change entries (seven-field format).
+- [docs/changes/cases/README.md](docs/changes/cases/README.md) — case folder naming convention.
+- [docs/changes/_templates/](docs/changes/_templates/) — local templates for new case records and index rotation.
+- [skills/topic_news_search/SKILL.md](skills/topic_news_search/SKILL.md) — skill instructions for topic-based news search.
+- [skills/article_digest_writer/SKILL.md](skills/article_digest_writer/SKILL.md) — skill instructions for writing article digests.

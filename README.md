@@ -1,0 +1,1 @@
+## A test file for agent friendly file installer pakage

@@ -1,3 +1,9 @@
+---
+sop_version: 1.0.0
+generated_at: 2026-04-23
+distilled_from: AGENTS.md
+---
+
 # CLAUDE.md
 
 ## Purpose
@@ -69,6 +75,19 @@ This includes tasks such as:
 - updating repository records
 
 Do not make repository changes before reading that file.
+
+---
+
+## Rule Precedence
+Higher items win on conflict:
+
+1. `CLAUDE.md` (this file) — agent entry point and SOP-level rules
+2. `AGENTS.md` — authoritative team rules, peer to this file
+3. `docs/change_principles.md` — cross-module change principles
+4. `docs/architecture.md` — module boundaries and repository structure
+5. implementation files / tests / schemas — source of truth for behavior
+
+In case of conflict between this file and `AGENTS.md` on team-specific rules, `AGENTS.md` wins.
 
 ---
 
@@ -232,6 +251,34 @@ Pause and clearly surface the issue instead of guessing when:
 - the task implies architectural or business intent not documented anywhere
 
 In these cases, prefer a minimal accurate draft with clearly marked unknowns.
+
+---
+
+## Target-Specific Rules
+See `AGENTS.md` for the authoritative team rules; this section is a navigation summary.
+
+### Team Conventions
+- Scope is fixed to Version 1 of the AI News Digest System; do not expand scope without explicit request.
+- Preserve the module responsibilities listed in `AGENTS.md` §Expected Module Responsibilities (`app/search.py`, `app/summarizer.py`, `app/writer.py`, `app/models.py`, `app/main.py`). Do not merge unrelated logic into one file.
+- When modifying code, add or update relevant tests; at minimum, validate search output structure, summarizer output structure, and Markdown file generation.
+- Prefer incremental progress over large speculative rewrites.
+
+### Domain Constraints
+- Do not fabricate article content.
+- If extraction fails, report failure honestly. Treat incomplete extraction as a valid result state.
+- If fewer than `n` valid articles are found, return the available results and report that clearly.
+- Each output Markdown file must include: title, source, URL, published date if available, extraction status, summary, key points, warnings if needed.
+
+### Forbidden Actions
+- Do not bypass paywalls.
+- Do not invent missing article text.
+- Do not silently skip failed results.
+- Do not perform broad crawling outside the requested task.
+- Do not claim successful extraction if the content was not actually extracted.
+- Do not add unrelated features without being asked.
+
+### Project-Specific Review or Approval Norms
+- None documented; Needs confirmation.
 
 ---
 

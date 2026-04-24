@@ -94,15 +94,104 @@ def _fetch_article_page(url: str) -> tuple[bool, str]:
         return False, ""
 
 
+BOILERPLATE_TAGS = (
+    "script", "style", "noscript",
+    "nav", "header", "footer", "aside",
+    "form", "button", "iframe",
+    "figure", "figcaption",
+)
+
+BOILERPLATE_CLASS_HINTS = (
+    "related", "share", "social", "subscribe", "newsletter",
+    "promo", "sidebar", "advert", "cookie",
+    "read-more", "readmore", "more-stories",
+    "comments", "recommend",
+)
+
+BOILERPLATE_PHRASES = (
+    "read more",
+    "continue reading",
+    "subscribe",
+    "sign up",
+    "sign in",
+    "log in",
+    "share",
+    "tweet",
+    "related articles",
+    "view comments",
+    "advertisement",
+    "accept cookies",
+    "cookie policy",
+    "privacy policy",
+    "terms of service",
+)
+
+_BOILERPLATE_PHRASE_RE = re.compile(
+    r"^\s*(?:" + "|".join(re.escape(p) for p in BOILERPLATE_PHRASES) + r")[\s.:!?]*$",
+    re.IGNORECASE,
+)
+
+ANCHOR_TEXT_MAX_LEN = 80
+
+
+def _node_has_boilerplate_hint(tag) -> bool:
+    tokens: list[str] = []
+    class_attr = tag.get("class") or []
+    if isinstance(class_attr, str):
+        tokens.append(class_attr)
+    else:
+        tokens.extend(class_attr)
+    id_attr = tag.get("id")
+    if id_attr:
+        tokens.append(id_attr)
+    joined = " ".join(tokens).lower()
+    if not joined:
+        return False
+    return any(hint in joined for hint in BOILERPLATE_CLASS_HINTS)
+
+
 def _extract_text_from_html(page_html: str) -> str:
     soup = BeautifulSoup(page_html, "html.parser")
 
-    for tag in soup(["script", "style", "noscript"]):
+    for tag in soup(list(BOILERPLATE_TAGS)):
         tag.decompose()
 
-    text = soup.get_text(separator=" ", strip=True)
-    cleaned_text = " ".join(text.split())
-    return cleaned_text
+    for tag in list(soup.find_all(True)):
+        if tag.parent is None:
+            continue
+        if _node_has_boilerplate_hint(tag):
+            tag.decompose()
+
+    for anchor in list(soup.find_all("a")):
+        if anchor.parent is None:
+            continue
+        anchor_text = anchor.get_text(" ", strip=True)
+        if (
+            anchor_text
+            and len(anchor_text) <= ANCHOR_TEXT_MAX_LEN
+            and _BOILERPLATE_PHRASE_RE.match(anchor_text)
+        ):
+            anchor.decompose()
+
+    main_container = (
+        soup.find("article")
+        or soup.find("main")
+        or soup.find(attrs={"role": "main"})
+    )
+    target = main_container if main_container is not None else soup
+
+    text = target.get_text(separator="\n", strip=True)
+
+    kept_lines: list[str] = []
+    for raw_line in text.splitlines():
+        line = " ".join(raw_line.split())
+        if not line:
+            continue
+        if _BOILERPLATE_PHRASE_RE.match(line):
+            continue
+        kept_lines.append(line)
+
+    return " ".join(kept_lines)
 
 def _split_into_sentences(text: str) -> list[str]:
     parts = re.split(r'(?<=[.!?])\s+', text)
@@ -115,6 +204,8 @@ def _build_simple_summary(article_text: str, max_sentences: int = 3) -> tuple[st
 
     usable_sentences = []
     for sentence in sentences:
+        if _BOILERPLATE_PHRASE_RE.match(sentence):
+            continue
         if len(sentence) >= 40:
             usable_sentences.append(sentence)
 
